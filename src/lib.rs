@@ -33,7 +33,7 @@ impl Pos {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Cell {
     value: Option<u8>,
     position: Pos,
@@ -61,7 +61,7 @@ impl Cell {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Sudoku {
     cells: Vec<Cell>,
 }
@@ -70,8 +70,22 @@ impl Sudoku {
     pub fn iter(&self) -> impl Iterator<Item = &Cell> {
         self.cells.iter()
     }
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut Cell> {
-        self.cells.iter_mut()
+    pub fn set_value_at(&mut self, value: u8, pos: Pos) {
+        if value == 0 || value > 9 {
+            panic!("Setting invalid value.");
+        }
+        self.cells
+            .iter_mut()
+            .find(|c| c.position == pos)
+            .unwrap()
+            .value = Some(value);
+    }
+    pub fn clear_value_at(&mut self, pos: Pos) {
+        self.cells
+            .iter_mut()
+            .find(|c| c.position == pos)
+            .unwrap()
+            .value = None;
     }
     pub fn get_rest_of_row(&'_ self, pos: Pos) -> impl Iterator<Item = u8> + '_ {
         self.iter()
@@ -106,10 +120,7 @@ impl Sudoku {
             .map(|c| c.value.unwrap())
     }
     pub fn get_cell_at_pos(&self, pos: Pos) -> &Cell {
-        self
-            .iter()
-            .find(|c| c.position == pos)
-            .unwrap()
+        self.iter().find(|c| c.position == pos).unwrap()
     }
 }
 
@@ -217,5 +228,25 @@ mod tests {
             .collect::<Vec<_>>();
         constraints.sort();
         assert_eq!(constraints, vec![1u8, 4, 5, 6, 7, 8]);
+    }
+
+    #[test]
+    fn mutate_sudoku() {
+        let mut mut_s = Sudoku::from_str(
+            ".5..83.17...1..4..3.4..56.8....3...9.9.8245....6....7...9....5...729..861.36.72.4",
+        )
+        .unwrap();
+        let s1 = Sudoku::from_str(
+            "35..83.17...1..4..3.4..56.8....3...9.9.8245....6....7...9....5...729..861.36.72.4",
+        )
+        .unwrap();
+        let s2 = Sudoku::from_str(
+            ".5..83.17...1..4..3.4..56.8....3...9.9.8245....6....7...9....5...729..861.36.72.4",
+        )
+        .unwrap();
+        mut_s.set_value_at(3, Pos::new(0, 0));
+        assert_eq!(mut_s, s1);
+        mut_s.clear_value_at(Pos::new(0, 0));
+        assert_eq!(mut_s, s2);
     }
 }

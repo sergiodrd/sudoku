@@ -88,19 +88,19 @@ impl Sudoku {
     pub fn get_rest_of_box(&'_ self, pos: Pos) -> impl Iterator<Item = u8> + '_ {
         let x = match pos.x {
             1..=2 => 0u8,
-            3..=5 => 1,
-            _ => 2,
+            3..=5 => 3,
+            _ => 6,
         };
         let y = match pos.y {
             1..=2 => 0u8,
-            3..=5 => 1,
-            _ => 2,
+            3..=5 => 3,
+            _ => 6,
         };
         self.iter()
             .filter(|&c| matches!(c.value, Some(_)))
             .filter(move |&c| {
-                (x * 3..=x * 3 + 2).contains(&c.position.x)
-                    && (y * 3..=y * 3 + 2).contains(&c.position.y)
+                (x..=x + 2).contains(&c.position.x)
+                    && (y..=y + 2).contains(&c.position.y)
                     && c.position != pos
             })
             .map(|c| c.value.unwrap())

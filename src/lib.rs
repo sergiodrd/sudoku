@@ -105,6 +105,12 @@ impl Sudoku {
             })
             .map(|c| c.value.unwrap())
     }
+    pub fn get_cell_at_pos(&self, pos: Pos) -> &Cell {
+        self
+            .iter()
+            .find(|c| c.position == pos)
+            .unwrap()
+    }
 }
 
 impl std::str::FromStr for Sudoku {
@@ -206,9 +212,7 @@ mod tests {
         )
         .unwrap();
         let mut constraints = s
-            .iter()
-            .find(|c| c.position == Pos::new(7, 1))
-            .unwrap()
+            .get_cell_at_pos(Pos::new(7, 1))
             .get_constraints(&s)
             .collect::<Vec<_>>();
         constraints.sort();

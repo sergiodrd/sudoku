@@ -86,21 +86,16 @@ impl Sudoku {
             .map(|c| c.value.unwrap())
     }
     pub fn get_rest_of_box(&'_ self, pos: Pos) -> impl Iterator<Item = u8> + '_ {
-        let (x, y);
-        if pos.x < 3 {
-            x = 0u8;
-        } else if pos.x < 6 {
-            x = 1;
-        } else {
-            x = 2;
-        }
-        if pos.y < 3 {
-            y = 0u8;
-        } else if pos.y < 6 {
-            y = 1;
-        } else {
-            y = 2;
-        }
+        let x = match pos.x {
+            1..=2 => 0u8,
+            3..=5 => 1,
+            _ => 2,
+        };
+        let y = match pos.y {
+            1..=2 => 0u8,
+            3..=5 => 1,
+            _ => 2,
+        };
         self.iter()
             .filter(|&c| matches!(c.value, Some(_)))
             .filter(move |&c| {
